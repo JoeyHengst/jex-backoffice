@@ -1,0 +1,190 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Beheer</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-tab-group>
+      <mat-tab label="Bedrijven">
+        <div class="tab-content">
+          <form
+            [formGroup]="companyForm"
+            (ngSubmit)="onCompanySubmit()"
+            class="form-container"
+          >
+            <mat-form-field appearance="outline">
+              <mat-label>Naam</mat-label>
+              <input
+                matInput
+                formControlName="name"
+                placeholder="Bedrijfsnaam"
+              />
+              <mat-error *ngIf="companyForm.get('name')?.hasError('required')"
+                >Naam is verplicht</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Adres</mat-label>
+              <input matInput formControlName="address" placeholder="Adres" />
+              <mat-error
+                *ngIf="companyForm.get('address')?.hasError('required')"
+                >Adres is verplicht</mat-error
+              >
+            </mat-form-field>
+            <div class="form-actions">
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="companyForm.invalid || loading"
+              >
+                <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+                <span *ngIf="!loading">{{
+                  isEditingCompany ? "Bijwerken" : "Toevoegen"
+                }}</span>
+              </button>
+              <button
+                mat-button
+                color="warn"
+                (click)="resetCompanyForm()"
+                *ngIf="isEditingCompany"
+              >
+                Annuleren
+              </button>
+            </div>
+          </form>
+          <div class="table-container">
+            <mat-spinner *ngIf="!(companies$ | async)"></mat-spinner>
+            <table
+              mat-table
+              [dataSource]="companyDataSource"
+              class="mat-elevation-z8"
+              *ngIf="companies$ | async"
+            >
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Naam</th>
+                <td mat-cell *matCellDef="let company">{{ company.name }}</td>
+              </ng-container>
+              <ng-container matColumnDef="address">
+                <th mat-header-cell *matHeaderCellDef>Adres</th>
+                <td mat-cell *matCellDef="let company">
+                  {{ company.address }}
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Acties</th>
+                <td mat-cell *matCellDef="let company">
+                  <button
+                    mat-icon-button
+                    color="primary"
+                    (click)="editCompany(company)"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="deleteCompany(company.id!)"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="companyColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: companyColumns"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab label="Vacatures">
+        <div class="tab-content">
+          <form
+            [formGroup]="jobForm"
+            (ngSubmit)="onJobSubmit()"
+            class="form-container"
+          >
+            <mat-form-field appearance="outline">
+              <mat-label>Titel</mat-label>
+              <input matInput formControlName="title" placeholder="Titel" />
+              <mat-error *ngIf="jobForm.get('title')?.hasError('required')"
+                >Titel is verplicht</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Omschrijving</mat-label>
+              <textarea
+                matInput
+                formControlName="description"
+                placeholder="Omschrijving"
+              ></textarea>
+              <mat-error
+                *ngIf="jobForm.get('description')?.hasError('required')"
+                >Omschrijving is verplicht</mat-error
+              >
+            </mat-form-field>
+            <div class="form-actions">
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="jobForm.invalid || loading"
+              >
+                <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+                <span *ngIf="!loading">{{
+                  isEditingJob ? "Bijwerken" : "Toevoegen"
+                }}</span>
+              </button>
+              <button
+                mat-button
+                color="warn"
+                (click)="resetJobForm()"
+                *ngIf="isEditingJob"
+              >
+                Annuleren
+              </button>
+            </div>
+          </form>
+          <div class="table-container">
+            <mat-spinner *ngIf="!(jobs$ | async)"></mat-spinner>
+            <table
+              mat-table
+              [dataSource]="jobDataSource"
+              class="mat-elevation-z8"
+              *ngIf="jobs$ | async"
+            >
+              <ng-container matColumnDef="title">
+                <th mat-header-cell *matHeaderCellDef>Titel</th>
+                <td mat-cell *matCellDef="let job">{{ job.title }}</td>
+              </ng-container>
+              <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef>Omschrijving</th>
+                <td mat-cell *matCellDef="let job">{{ job.description }}</td>
+              </ng-container>
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Acties</th>
+                <td mat-cell *matCellDef="let job">
+                  <button
+                    mat-icon-button
+                    color="primary"
+                    (click)="editJob(job)"
+                  >
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="deleteJob(job.id!)"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </ng-container>
+              <tr mat-header-row *matHeaderRowDef="jobColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: jobColumns"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>
