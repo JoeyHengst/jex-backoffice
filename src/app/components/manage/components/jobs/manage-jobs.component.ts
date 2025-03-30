@@ -3,16 +3,11 @@ import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import {
-  ReactiveFormsModule,
-  FormBuilder,
-  Validators,
-  FormGroup,
-} from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { JobService } from '../../../../services/job.service';
 import { CompanyService } from '../../../../services/company.service';
 import { Job } from '../../../../models/job.model';
-import { BehaviorSubject, switchMap } from 'rxjs';
+import { BehaviorSubject, switchMap, take } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -45,10 +40,9 @@ export class JobManageComponent {
 
   jobColumns = ['title', 'description', 'company', 'actions'];
   jobDataSource = new MatTableDataSource<Job>([]);
-  private jobRefresh = new BehaviorSubject<void>(undefined);
 
   companies$ = this.companyService.getCompanies();
-  jobs$ = this.jobRefresh.pipe(switchMap(() => this.jobService.getJobs()));
+  jobs$ = this.jobService.getJobs();
 
   jobForm = this.fb.group({
     title: ['', Validators.required],
@@ -60,8 +54,12 @@ export class JobManageComponent {
   isEditingJob = false;
   editingJobId: string | null = null;
 
+  companyMap: { [key: number]: string } = {};
+
   constructor() {
-    this.jobs$.subscribe((jobs) => (this.jobDataSource.data = jobs || []));
+    this.jobs$.pipe(take(1)).subscribe((jobs) => {
+      this.jobDataSource.data = jobs;
+    });
   }
 
   onJobSubmit(): void {
@@ -75,7 +73,6 @@ export class JobManageComponent {
         next: () => this.handleSuccess('Vacature bijgewerkt'),
         error: () => this.handleError('Fout bij bijwerken vacature'),
         complete: () => {
-          this.jobRefresh.next();
           this.resetJobForm();
         },
       });
@@ -84,7 +81,6 @@ export class JobManageComponent {
         next: () => this.handleSuccess('Vacature toegevoegd'),
         error: () => this.handleError('Fout bij toevoegen vacature'),
         complete: () => {
-          this.jobRefresh.next();
           this.resetJobForm();
         },
       });
@@ -105,7 +101,6 @@ export class JobManageComponent {
     this.jobService.deleteJob(id).subscribe({
       next: () => this.handleSuccess('Vacature verwijderd'),
       error: () => this.handleError('Fout bij verwijderen vacature'),
-      complete: () => this.jobRefresh.next(),
     });
   }
 
@@ -114,16 +109,6 @@ export class JobManageComponent {
     this.isEditingJob = false;
     this.editingJobId = null;
     this.loading = false;
-  }
-
-  getCompanyName(companyId: string): string {
-    const companies = this.companyService.getCompanies();
-    let companyName = '';
-    companies.subscribe((companies) => {
-      const company = companies.find((c) => c.id === companyId);
-      companyName = company ? company.name : 'Onbekend';
-    });
-    return companyName;
   }
 
   private handleSuccess(message: string): void {

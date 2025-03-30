@@ -1,0 +1,31 @@
+.container {
+  padding: 20px;
+}
+mat-card {
+  padding: 20px;
+}
+mat-card-title {
+  font-size: 24px;
+}
+mat-card-subtitle {
+  color: #666;
+}
+h3 {
+  margin: 20px 0 10px;
+}
+mat-list-item {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.job-item:hover {
+  background-color: #f5f5f5;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.view-details {
+  margin-left: auto;
+}
+p {
+  margin: 10px 0;
+}

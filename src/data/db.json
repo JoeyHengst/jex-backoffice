@@ -11,11 +11,6 @@
       "name": "Jex",
       "address": "Nassaukade 5",
       "createdAt": "2025-03-30T07:19:00Z"
-    },
-    {
-      "id": "147f",
-      "name": "dasdasd",
-      "address": "dasdasd"
     }
   ],
   "jobs": [
@@ -42,13 +37,25 @@
       "id": "ec17",
       "title": "dasdasdas",
       "description": "dasdasdas",
-      "companyId": "147f"
+      "companyId": null
     },
     {
       "id": "161e",
       "title": "asdsad",
       "description": "dasdasd",
       "companyId": "1"
+    },
+    {
+      "id": "0e3d",
+      "title": "dfgdfg",
+      "description": "dfgfdg",
+      "companyId": "1"
+    },
+    {
+      "id": "a660",
+      "title": "Aanmaken test vacature",
+      "description": "Ik ben een omschrijving",
+      "companyId": "2"
     }
   ]
 }

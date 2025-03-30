@@ -2,17 +2,12 @@ import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import {
-  ReactiveFormsModule,
-  FormBuilder,
-  Validators,
-  FormGroup,
-} from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { CompanyService } from '../../../../services/company.service';
 import { JobService } from '../../../../services/job.service';
 import { Company } from '../../../../models/company.model';
 import { Job } from '../../../../models/job.model';
-import { BehaviorSubject, combineLatest, map, switchMap } from 'rxjs';
+import { combineLatest, map, switchMap } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -42,13 +37,8 @@ export class CompanyManageComponent {
   private fb = inject(FormBuilder);
   private snackBar = inject(MatSnackBar);
 
-  private companyRefresh = new BehaviorSubject<void>(undefined);
-  private jobRefresh = new BehaviorSubject<void>(undefined);
-
-  companies$ = this.companyRefresh.pipe(
-    switchMap(() => this.companyService.getCompanies())
-  );
-  jobs$ = this.jobRefresh.pipe(switchMap(() => this.jobService.getJobs()));
+  companies$ = this.companyService.getCompanies();
+  jobs$ = this.jobService.getJobs();
 
   companiesWithJobs$ = combineLatest([this.companies$, this.jobs$]).pipe(
     switchMap(([companies, jobs]) =>
@@ -90,7 +80,6 @@ export class CompanyManageComponent {
           next: () => this.handleSuccess('Bedrijf bijgewerkt'),
           error: () => this.handleError('Fout bij bijwerken bedrijf'),
           complete: () => {
-            this.companyRefresh.next();
             this.resetCompanyForm();
           },
         });
@@ -99,7 +88,6 @@ export class CompanyManageComponent {
         next: () => this.handleSuccess('Bedrijf toegevoegd'),
         error: () => this.handleError('Fout bij toevoegen bedrijf'),
         complete: () => {
-          this.companyRefresh.next();
           this.resetCompanyForm();
         },
       });
@@ -120,7 +108,6 @@ export class CompanyManageComponent {
       next: () => this.handleSuccess('Vacature toegevoegd'),
       error: () => this.handleError('Fout bij toevoegen vacature'),
       complete: () => {
-        this.jobRefresh.next();
         this.quickJobForm.reset();
         this.loading = false;
       },
@@ -140,7 +127,6 @@ export class CompanyManageComponent {
     this.companyService.deleteCompany(id).subscribe({
       next: () => this.handleSuccess('Bedrijf verwijderd'),
       error: () => this.handleError('Fout bij verwijderen bedrijf'),
-      complete: () => this.companyRefresh.next(),
     });
   }
 
@@ -148,7 +134,7 @@ export class CompanyManageComponent {
     this.jobService.deleteJob(id).subscribe({
       next: () => this.handleSuccess('Vacature verwijderd'),
       error: () => this.handleError('Fout bij verwijderen vacature'),
-      complete: () => this.jobRefresh.next(),
+      complete: () => {},
     });
   }
 
