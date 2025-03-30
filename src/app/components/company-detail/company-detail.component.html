@@ -1,0 +1,27 @@
+<div class="container" *ngIf="companyWithJobs$ | async as data; else loading">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ data.company.name }}</mat-card-title>
+      <mat-card-subtitle>{{ data.company.address }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <h3>Actieve Vacatures</h3>
+      <mat-list *ngIf="data.jobs && data.jobs.length > 0; else noJobs">
+        <mat-list-item
+          class="job-item"
+          *ngFor="let job of data.jobs"
+          [routerLink]="['/job', job.id]"
+        >
+          <span matListItemTitle>{{ job.title }}</span>
+          <span matListItemLine>{{ job.description }}</span>
+        </mat-list-item>
+      </mat-list>
+      <ng-template #noJobs>
+        <p>Geen actieve vacatures voor dit bedrijf.</p>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+</div>
+<ng-template #loading>
+  <p>Laden...</p>
+</ng-template>

@@ -35,33 +35,7 @@ import { CommonModule, NgIf } from '@angular/common';
   ],
   selector: 'app-create-job',
   templateUrl: './create-job.component.html',
-  styles: [
-    `
-      mat-card {
-        margin: 20px;
-        padding: 16px;
-      }
-      .form-container {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
-      .form-actions {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-      }
-      mat-form-field {
-        width: 100%;
-      }
-      textarea {
-        height: 100px;
-      }
-      button mat-spinner {
-        margin-right: 8px;
-      }
-    `,
-  ],
+  styleUrls: ['./create-job.component.scss'],
 })
 export class CreateJobComponent {
   private jobService = inject(JobService);

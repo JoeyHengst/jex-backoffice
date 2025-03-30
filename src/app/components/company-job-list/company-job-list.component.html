@@ -14,23 +14,18 @@
   <mat-card
     *ngFor="let company of filteredCompanies$ | async"
     class="company-card"
+    [routerLink]="['/company', company.id]"
   >
     <mat-card-header>
       <mat-card-title>{{ company.name }}</mat-card-title>
       <mat-card-subtitle>{{ company.address }}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      <h4>Actieve vacatures:</h4>
-      <div *ngFor="let job of company.jobs" class="job-item">
-        <p>{{ job.title }}</p>
-        <button
-          mat-raised-button
-          color="primary"
-          [routerLink]="['/job', job.id]"
-        >
-          Details
-        </button>
-      </div>
+      <p>
+        {{ company.jobs.length }} actieve vacature{{
+          company.jobs.length === 1 ? "" : "s"
+        }}
+      </p>
     </mat-card-content>
   </mat-card>
 </div>

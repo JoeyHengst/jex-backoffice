@@ -48,6 +48,7 @@
         }}</span>
       </button>
       <button
+        type="button"
         mat-button
         color="warn"
         (click)="resetJobForm()"
@@ -62,8 +63,8 @@
     <table
       mat-table
       [dataSource]="jobDataSource"
-      class="mat-elevation-z8"
       *ngIf="jobs$ | async"
+      class="mat-elevation-z8"
     >
       <ng-container matColumnDef="title">
         <th mat-header-cell *matHeaderCellDef>Titel</th>
@@ -74,10 +75,8 @@
         <td mat-cell *matCellDef="let job">{{ job.description }}</td>
       </ng-container>
       <ng-container matColumnDef="company">
-        <th mat-header-cell *matHeaderCellDef>Bedrijf</th>
-        <td mat-cell *matCellDef="let job">
-          {{ getCompanyName(job.companyId) }}
-        </td>
+        <th mat-header-cell *matHeaderCellDef>BedrijfsID</th>
+        <td mat-cell *matCellDef="let job">{{ job.companyId }}</td>
       </ng-container>
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Acties</th>
