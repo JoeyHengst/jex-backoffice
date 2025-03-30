@@ -1,0 +1,37 @@
+.tab-content {
+  padding: 20px;
+}
+.form-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
+mat-form-field {
+  flex: 1;
+  min-width: 200px;
+}
+table {
+  width: 100%;
+}
+.table-container {
+  position: relative;
+  min-height: 100px;
+}
+mat-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+textarea {
+  height: 100px;
+}
+button mat-spinner {
+  margin-right: 8px;
+}

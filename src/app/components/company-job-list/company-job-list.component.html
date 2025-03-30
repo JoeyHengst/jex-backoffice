@@ -1,0 +1,36 @@
+<div class="search-container">
+  <mat-form-field appearance="outline" class="search-bar">
+    <mat-label>Zoek vacatures</mat-label>
+    <mat-icon matSuffix>search</mat-icon>
+    <input
+      matInput
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange($event)"
+      placeholder="Typ een vacaturetitel..."
+    />
+  </mat-form-field>
+</div>
+<div class="company-list">
+  <mat-card
+    *ngFor="let company of filteredCompanies$ | async"
+    class="company-card"
+  >
+    <mat-card-header>
+      <mat-card-title>{{ company.name }}</mat-card-title>
+      <mat-card-subtitle>{{ company.address }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <h4>Actieve vacatures:</h4>
+      <div *ngFor="let job of company.jobs" class="job-item">
+        <p>{{ job.title }}</p>
+        <button
+          mat-raised-button
+          color="primary"
+          [routerLink]="['/job', job.id]"
+        >
+          Details
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

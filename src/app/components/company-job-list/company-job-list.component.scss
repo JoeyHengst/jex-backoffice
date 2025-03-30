@@ -1,0 +1,14 @@
+.company-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+.company-card {
+  margin: 10px;
+}
+.job-item {
+  margin: 10px 0;
+}
+.search-bar {
+  width: 100%;
+}

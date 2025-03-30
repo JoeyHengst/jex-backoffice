@@ -1,0 +1,15 @@
+<div *ngIf="job$ | async as job" class="job-detail">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ job.title }}</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <p>{{ job.description }}</p>
+      <p>Bedrijf ID: {{ job.companyId }}</p>
+      <p>Gecreëerd op: {{ job.createdAt | date }}</p>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button routerLink="/companies-jobs">Terug</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

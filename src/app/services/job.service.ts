@@ -25,13 +25,13 @@ export class JobService {
       .pipe(catchError(this.handleError));
   }
 
-  updateJob(id: number, job: Job): Observable<Job> {
+  updateJob(id: string, job: Job): Observable<Job> {
     return this.http
       .put<Job>(`${this.API_URL}/jobs/${id}`, job)
       .pipe(catchError(this.handleError));
   }
 
-  deleteJob(id: number): Observable<void> {
+  deleteJob(id: string): Observable<void> {
     return this.http
       .delete<void>(`${this.API_URL}/jobs/${id}`)
       .pipe(catchError(this.handleError));
