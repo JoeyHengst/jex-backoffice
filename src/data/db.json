@@ -1,37 +1,54 @@
 {
   "companies": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Studder",
       "address": "Judith Leysterstraat 4",
       "createdAt": "2025-03-30T07:19:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Jex",
       "address": "Nassaukade 5",
       "createdAt": "2025-03-30T07:19:00Z"
+    },
+    {
+      "id": "147f",
+      "name": "dasdasd",
+      "address": "dasdasd"
     }
   ],
   "jobs": [
     {
-      "id": 1,
+      "id": "1",
       "title": "Senior Frontend Developer",
       "description": "Lead development of innovative solutions",
-      "companyId": 1,
+      "companyId": "1",
       "createdAt": "2025-03-30T07:19:00Z"
     },
     {
-      "id": 2,
+      "id": "2",
       "title": "Senior Product Manager",
       "description": "Manage product lifecycle",
-      "companyId": 2,
+      "companyId": "2",
       "createdAt": "2025-03-30T07:19:00Z"
     },
     {
       "id": "9fd0",
       "title": "dasd",
       "description": "dasds"
+    },
+    {
+      "id": "ec17",
+      "title": "dasdasdas",
+      "description": "dasdasdas",
+      "companyId": "147f"
+    },
+    {
+      "id": "161e",
+      "title": "asdsad",
+      "description": "dasdasd",
+      "companyId": "1"
     }
   ]
 }

@@ -10,6 +10,9 @@
       <a mat-list-item routerLink="/companies-jobs" routerLinkActive="active">
         <mat-icon>business</mat-icon> Bedrijven & Vacatures
       </a>
+      <a mat-list-item routerLink="/create-job" routerLinkActive="active">
+        <mat-icon>work</mat-icon> Vacature aanmaken
+      </a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
@@ -17,7 +20,7 @@
       <button mat-icon-button (click)="sidenav.toggle()">
         <mat-icon>menu</mat-icon>
       </button>
-      <span>Applicatie</span>
+      <span>{{ currentTitle }}</span>
     </mat-toolbar>
     <div class="content">
       <router-outlet></router-outlet>

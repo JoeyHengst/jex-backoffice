@@ -1,7 +1,7 @@
 export interface Job {
-  id?: number;
+  id?: string;
   title: string;
   description: string;
-  companyId?: number;
+  companyId?: string;
   createdAt?: Date;
 }

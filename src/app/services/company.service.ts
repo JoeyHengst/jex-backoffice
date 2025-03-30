@@ -25,13 +25,13 @@ export class CompanyService {
       .pipe(catchError(this.handleError));
   }
 
-  updateCompany(id: number, company: Company): Observable<Company> {
+  updateCompany(id: string, company: Company): Observable<Company> {
     return this.http
       .put<Company>(`${this.API_URL}/companies/${id}`, company)
       .pipe(catchError(this.handleError));
   }
 
-  deleteCompany(id: number): Observable<void> {
+  deleteCompany(id: string): Observable<void> {
     return this.http
       .delete<void>(`${this.API_URL}/companies/${id}`)
       .pipe(catchError(this.handleError));

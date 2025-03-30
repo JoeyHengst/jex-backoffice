@@ -26,7 +26,7 @@ export class JobDetailComponent {
 
   job$ = this.route.paramMap.pipe(
     switchMap((params) => {
-      const id = Number(params.get('id'));
+      const id = params.get('id');
       return this.jobService
         .getJobs()
         .pipe(map((jobs) => jobs.find((job) => job.id === id)));

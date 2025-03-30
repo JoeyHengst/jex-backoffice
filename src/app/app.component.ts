@@ -1,10 +1,16 @@
-import { Component } from '@angular/core';
-import { RouterModule, RouterOutlet } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import {
+  NavigationEnd,
+  Router,
+  RouterModule,
+  RouterOutlet,
+} from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { filter, map } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -36,4 +42,29 @@ import { MatButtonModule } from '@angular/material/button';
     `,
   ],
 })
-export class AppComponent {}
+export class AppComponent {
+  private router = inject(Router);
+  currentTitle: string = 'Backoffice';
+
+  private routeTitles: { [key: string]: string } = {
+    '/manage': 'Beheer',
+    '/companies-jobs': 'Bedrijven & Vacatures',
+    '/job': 'Vacature Details',
+    '/create-job': 'Vacature Aanmaken',
+  };
+
+  constructor() {
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        map(() => this.router.url.split('?')[0])
+      )
+      .subscribe((url) => {
+        const baseRoute =
+          Object.keys(this.routeTitles).find((route) =>
+            url.startsWith(route)
+          ) || url;
+        this.currentTitle = this.routeTitles[baseRoute] || 'Backoffice';
+      });
+  }
+}

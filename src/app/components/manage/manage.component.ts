@@ -4,18 +4,32 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { CompanyService } from '../../services/company.service';
 import { JobService } from '../../services/job.service';
 import { Company } from '../../models/company.model';
 import { Job } from '../../models/job.model';
-import { BehaviorSubject, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  combineLatest,
+  map,
+  Observable,
+  switchMap,
+} from 'rxjs';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { CompanyManageComponent } from './components/company/manage-company.component';
+import { JobManageComponent } from './components/jobs/manage-jobs.component';
 
 @Component({
   standalone: true,
@@ -32,9 +46,28 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatTabsModule,
+    MatExpansionModule,
+    CompanyManageComponent,
+    JobManageComponent,
   ],
   selector: 'app-manage',
-  templateUrl: './manage.component.html',
+  template: `
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Beheer</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-tab-group>
+          <mat-tab label="Bedrijven">
+            <app-manage-company></app-manage-company>
+          </mat-tab>
+          <mat-tab label="Vacatures">
+            <app-manage-jobs></app-manage-jobs>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  `,
   styleUrls: ['./manage.component.scss'],
 })
 export class ManageComponent {
@@ -57,6 +90,19 @@ export class ManageComponent {
   );
   jobs$ = this.jobRefresh.pipe(switchMap(() => this.jobService.getJobs()));
 
+  companiesWithJobs$ = combineLatest([this.companies$, this.jobs$]).pipe(
+    switchMap(([companies, jobs]) =>
+      this.companyService.getCompanies().pipe(
+        map((companies) =>
+          companies.map((company) => ({
+            ...company,
+            jobs: jobs.filter((job) => job.companyId === company.id),
+          }))
+        )
+      )
+    )
+  );
+
   companyForm = this.fb.group({
     name: ['', Validators.required],
     address: ['', Validators.required],
@@ -65,13 +111,14 @@ export class ManageComponent {
   jobForm = this.fb.group({
     title: ['', Validators.required],
     description: ['', Validators.required],
+    companyId: [null, Validators.required],
   });
 
   loading = false;
   isEditingCompany = false;
   isEditingJob = false;
-  editingCompanyId: number | null = null;
-  editingJobId: number | null = null;
+  editingCompanyId: string | string | null = null;
+  editingJobId: string | null = null;
 
   constructor() {
     this.companies$.subscribe(
@@ -81,59 +128,55 @@ export class ManageComponent {
   }
 
   onCompanySubmit(): void {
-    if (this.companyForm.invalid) return;
-
-    this.loading = true;
-    const companyData: Company = this.companyForm.value as Company;
-
-    if (this.isEditingCompany && this.editingCompanyId) {
-      this.companyService
-        .updateCompany(this.editingCompanyId, companyData)
-        .subscribe({
-          next: () => this.handleSuccess('Bedrijf bijgewerkt'),
-          error: () => this.handleError('Fout bij bijwerken bedrijf'),
-          complete: () => {
-            this.companyRefresh.next();
-            this.resetCompanyForm();
-          },
-        });
-    } else {
-      this.companyService.createCompany(companyData).subscribe({
-        next: () => this.handleSuccess('Bedrijf toegevoegd'),
-        error: () => this.handleError('Fout bij toevoegen bedrijf'),
-        complete: () => {
-          this.companyRefresh.next();
-          this.resetCompanyForm();
-        },
-      });
-    }
+    this.submitForm(
+      this.companyForm,
+      this.companyService,
+      (data: Company) => this.companyService.createCompany(data),
+      (id, data) => this.companyService.updateCompany(id, data),
+      this.isEditingCompany,
+      this.editingCompanyId,
+      'Bedrijf toegevoegd',
+      'Fout bij toevoegen bedrijf',
+      this.companyRefresh,
+      () => this.resetCompanyForm()
+    );
   }
 
   onJobSubmit(): void {
+    this.submitForm(
+      this.jobForm,
+      this.jobService,
+      (data: Job) => this.jobService.createJob(data),
+      (id, data) => this.jobService.updateJob(id, data),
+      this.isEditingJob,
+      this.editingJobId,
+      'Vacature toegevoegd',
+      'Fout bij toevoegen vacature',
+      this.jobRefresh,
+      () => this.resetJobForm()
+    );
+  }
+
+  onQuickJobSubmit(companyId: string | string): void {
+    this.jobForm.markAllAsTouched();
     if (this.jobForm.invalid) return;
 
     this.loading = true;
-    const jobData: Job = this.jobForm.value as Job;
+    const quickJob: Job = {
+      title: this.jobForm.value.title!,
+      description: this.jobForm.value.description!,
+      companyId: companyId,
+    };
 
-    if (this.isEditingJob && this.editingJobId) {
-      this.jobService.updateJob(this.editingJobId, jobData).subscribe({
-        next: () => this.handleSuccess('Vacature bijgewerkt'),
-        error: () => this.handleError('Fout bij bijwerken vacature'),
-        complete: () => {
-          this.jobRefresh.next();
-          this.resetJobForm();
-        },
-      });
-    } else {
-      this.jobService.createJob(jobData).subscribe({
-        next: () => this.handleSuccess('Vacature toegevoegd'),
-        error: () => this.handleError('Fout bij toevoegen vacature'),
-        complete: () => {
-          this.jobRefresh.next();
-          this.resetJobForm();
-        },
-      });
-    }
+    this.jobService.createJob(quickJob).subscribe({
+      next: () => this.handleSuccess('Vacature toegevoegd'),
+      error: () => this.handleError('Fout bij toevoegen vacature'),
+      complete: () => {
+        this.jobRefresh.next();
+        this.jobForm.reset();
+        this.loading = false;
+      },
+    });
   }
 
   editCompany(company: Company): void {
@@ -154,7 +197,7 @@ export class ManageComponent {
     });
   }
 
-  deleteCompany(id: number): void {
+  deleteCompany(id: string | string): void {
     this.companyService.deleteCompany(id).subscribe({
       next: () => this.handleSuccess('Bedrijf verwijderd'),
       error: () => this.handleError('Fout bij verwijderen bedrijf'),
@@ -162,7 +205,7 @@ export class ManageComponent {
     });
   }
 
-  deleteJob(id: number): void {
+  deleteJob(id: string): void {
     this.jobService.deleteJob(id).subscribe({
       next: () => this.handleSuccess('Vacature verwijderd'),
       error: () => this.handleError('Fout bij verwijderen vacature'),
@@ -192,5 +235,35 @@ export class ManageComponent {
   private handleError(message: string): void {
     this.snackBar.open(message, 'Sluiten', { duration: 3000 });
     this.loading = false;
+  }
+
+  private submitForm<T>(
+    form: FormGroup,
+    service: CompanyService | JobService,
+    createFn: (data: T) => Observable<T>,
+    updateFn: (id: string, data: T) => Observable<T>,
+    isEditing: boolean,
+    editingId: string | null,
+    successMsg: string,
+    errorMsg: string,
+    refresh: BehaviorSubject<void>,
+    resetFn: () => void
+  ): void {
+    if (form.invalid) return;
+
+    this.loading = true;
+    const data = form.value as T;
+
+    const action =
+      isEditing && editingId ? updateFn(editingId, data) : createFn(data);
+
+    action.subscribe({
+      next: () => this.handleSuccess(successMsg),
+      error: () => this.handleError(errorMsg),
+      complete: () => {
+        refresh.next();
+        resetFn();
+      },
+    });
   }
 }

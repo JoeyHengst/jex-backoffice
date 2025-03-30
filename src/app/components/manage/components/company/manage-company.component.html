@@ -1,0 +1,109 @@
+<div class="tab-content">
+  <form
+    [formGroup]="companyForm"
+    (ngSubmit)="onCompanySubmit()"
+    class="form-container"
+  >
+    <mat-form-field appearance="outline">
+      <mat-label>Naam</mat-label>
+      <input matInput formControlName="name" placeholder="Bedrijfsnaam" />
+      <mat-error *ngIf="companyForm.get('name')?.hasError('required')"
+        >Naam is verplicht</mat-error
+      >
+    </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Adres</mat-label>
+      <input matInput formControlName="address" placeholder="Adres" />
+      <mat-error *ngIf="companyForm.get('address')?.hasError('required')"
+        >Adres is verplicht</mat-error
+      >
+    </mat-form-field>
+    <div class="form-actions">
+      <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+        [disabled]="companyForm.invalid || loading"
+      >
+        <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+        <span *ngIf="!loading">{{
+          isEditingCompany ? "Bijwerken" : "Toevoegen"
+        }}</span>
+      </button>
+      <button
+        type="button"
+        mat-button
+        color="warn"
+        (click)="resetCompanyForm()"
+        *ngIf="isEditingCompany"
+      >
+        Annuleren
+      </button>
+    </div>
+  </form>
+  <div class="table-container">
+    <mat-spinner *ngIf="!(companiesWithJobs$ | async)"></mat-spinner>
+    <mat-accordion *ngIf="companiesWithJobs$ | async as companies">
+      <mat-expansion-panel *ngFor="let company of companies" [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>{{ company.name }}</mat-panel-title>
+          <mat-panel-description>{{ company.address }}</mat-panel-description>
+        </mat-expansion-panel-header>
+        <div class="company-jobs">
+          <h4>Vacatures:</h4>
+          <ul *ngIf="company.jobs.length > 0; else noJobs">
+            <li *ngFor="let job of company.jobs">
+              {{ job.title }} - {{ job.description }}
+              <button mat-icon-button color="warn" (click)="deleteJob(job.id!)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </li>
+          </ul>
+          <ng-template #noJobs><p>Geen vacatures gekoppeld.</p></ng-template>
+          <form
+            [formGroup]="quickJobForm"
+            (ngSubmit)="onQuickJobSubmit(company.id!)"
+            class="quick-job-form"
+          >
+            <mat-form-field appearance="outline">
+              <mat-label>Titel</mat-label>
+              <input matInput formControlName="title" placeholder="Titel" />
+              <mat-error *ngIf="quickJobForm.get('title')?.hasError('required')"
+                >Titel is verplicht</mat-error
+              >
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Omschrijving</mat-label>
+              <textarea
+                matInput
+                formControlName="description"
+                placeholder="Omschrijving"
+              ></textarea>
+              <mat-error
+                *ngIf="quickJobForm.get('description')?.hasError('required')"
+                >Omschrijving is verplicht</mat-error
+              >
+            </mat-form-field>
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="quickJobForm.invalid || loading"
+            >
+              <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+              <span *ngIf="!loading">Toevoegen</span>
+            </button>
+          </form>
+        </div>
+        <mat-action-row>
+          <button mat-button color="primary" (click)="editCompany(company)">
+            Bewerken
+          </button>
+          <button mat-button color="warn" (click)="deleteCompany(company.id!)">
+            Verwijderen
+          </button>
+        </mat-action-row>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>
